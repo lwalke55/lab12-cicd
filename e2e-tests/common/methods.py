@@ -26,7 +26,7 @@ def anonymizers():
     )
     return response.status_code, response.content
 
-def genz():
+def genz(data):
     response = requests.get(
         f"{ANONYMIZER_BASE_URL}/genz", headers=DEFAULT_HEADERS
     )
