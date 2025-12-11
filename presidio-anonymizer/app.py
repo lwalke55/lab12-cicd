@@ -7,7 +7,7 @@ from pathlib import Path
 
 from flask import Flask, Response, jsonify, request
 from presidio_anonymizer import AnonymizerEngine, DeanonymizeEngine
-from presidio_anonymizer.entities import InvalidParamError, OperatorConfig
+from presidio_anonymizer.entities import InvalidParamError
 from presidio_anonymizer.services.app_entities_convertor import AppEntitiesConvertor
 from werkzeug.exceptions import BadRequest, HTTPException
 
@@ -95,7 +95,7 @@ class Server:
         def deanonymizers():
             """Return a list of supported deanonymizers."""
             return jsonify(self.deanonymize.get_deanonymizers())
-        
+
         @self.app.route("/genz-preview", methods=["GET"])
         def genz_preview():
             example = {
@@ -104,7 +104,7 @@ class Server:
                             "description": "Example output of the genz anonymizer."
                     }
             return jsonify(example)
-        
+
         @self.app.route("/genz", methods=["POST"])
         def genz() -> Response:
             content = request.get_json()
