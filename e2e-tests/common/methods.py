@@ -26,6 +26,11 @@ def anonymizers():
     )
     return response.status_code, response.content
 
+def genz():
+    response = requests.get(
+        f"{ANONYMIZER_BASE_URL}/genz", headers=DEFAULT_HEADERS
+    )
+    return response.status_code, response.content
 
 
 def deanonymize(data):
