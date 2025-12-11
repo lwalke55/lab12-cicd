@@ -7,7 +7,7 @@ from pathlib import Path
 
 from flask import Flask, Response, jsonify, request
 from presidio_anonymizer import AnonymizerEngine, DeanonymizeEngine
-from presidio_anonymizer.entities import InvalidParamError
+from presidio_anonymizer.entities import InvalidParamError, OperatorConfig
 from presidio_anonymizer.services.app_entities_convertor import AppEntitiesConvertor
 from werkzeug.exceptions import BadRequest, HTTPException
 
@@ -104,6 +104,28 @@ class Server:
                             "description": "Example output of the genz anonymizer."
                     }
             return jsonify(example)
+        
+        @self.app.route("/genz", methods=["POST"])
+        def genz() -> Response:
+            content = request.get_json()
+            if not content:
+                raise BadRequest("Invalid request json")
+
+            anonymizers_config = AppEntitiesConvertor.operators_config_from_json(
+                content.get("anonymizers")
+            )
+            if AppEntitiesConvertor.check_custom_operator(anonymizers_config):
+                raise BadRequest("Custom type anonymizer is not supported")
+
+            analyzer_results = AppEntitiesConvertor.analyzer_results_from_json(
+                content.get("analyzer_results")
+            )
+            anoymizer_result = self.anonymizer.anonymize(
+                text=content.get("text", ""),
+                analyzer_results=analyzer_results,
+                operators=anonymizers_config,
+            )
+            return Response(anoymizer_result.to_json(), mimetype="application/json")
 
         @self.app.errorhandler(InvalidParamError)
         def invalid_param(err):
